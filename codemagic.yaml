@@ -4,11 +4,37 @@ workflows:
     max_build_duration: 60
     scripts:
       - name: Fix Android project
-        script: flutter create . --project-name saathiya_app --platforms=android
-      - name: Set Firebase package name
+        script: flutter create . --project-name app --org com.saathiya --platforms=android
+      - name: Check Firebase file
+        script: ls android/app/google-services.json
+      - name: Apply Google Services plugin
         script: |
-          sed -i 's/applicationId = ".*"/applicationId = "com.saathiya.app"/' android/app/build.gradle || sed -i 's/applicationId ".*"/applicationId "com.saathiya.app"/' android/app/build.gradle
-          ls android/app/google-services.json
+          python3 << 'PY'
+          import pathlib
+          root = pathlib.Path('android/app/build.gradle.kts')
+          if root.exists():
+            t = root.read_text()
+            if 'com.google.gms.google-services' not in t:
+              t = t.replace('id("com.android.application")', 'id("com.android.application")\n    id("com.google.gms.google-services")')
+              root.write_text(t)
+            print(root.read_text())
+          else:
+            app = pathlib.Path('android/app/build.gradle')
+            t = app.read_text()
+            if 'google-services' not in t:
+              app.write_text(t + "\napply plugin: 'com.google.gms.google-services'\n")
+          for name in ['android/build.gradle.kts', 'android/build.gradle']:
+            p = pathlib.Path(name)
+            if p.exists():
+              t = p.read_text()
+              if 'google-services' not in t:
+                if name.endswith('.kts'):
+                  t = t.replace('dependencies {', 'dependencies {\n        classpath("com.google.gms:google-services:4.4.2")')
+                else:
+                  t = t.replace('dependencies {', "dependencies {\n        classpath 'com.google.gms:google-services:4.4.2'")
+                p.write_text(t)
+              print('patched', name)
+          PY
       - name: Get dependencies
         script: flutter pub get
       - name: Build APK
