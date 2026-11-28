@@ -38,7 +38,7 @@ class SplashScreen extends StatelessWidget {
             Text("Kya Tum Meri Saathiya Banogi?", style: TextStyle(color: Colors.white70, fontSize: 18)),
             SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()))
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen())),
               child: Text("Shuru Karein ❤️"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
             )
