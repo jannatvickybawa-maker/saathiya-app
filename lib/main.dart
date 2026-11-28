@@ -37,7 +37,7 @@ class SplashScreen extends StatelessWidget {
             Text("Kya Tum Meri Saathiya Banogi?", style: TextStyle(color: Colors.white70, fontSize: 18)),
             SizedBox(height: 40),
             ElevatedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SwipeScreen())),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()))
               child: Text("Shuru Karein ❤️"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.pink, padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
             )
@@ -103,6 +103,52 @@ class FinishScreen extends StatelessWidget {
             Text("Abhi ke liye aur profile nahi hai."),
             SizedBox(height: 20),
             ElevatedButton(onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SwipeScreen())), child: Text("Phir Se Dekho")),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class LoginScreen extends StatefulWidget {
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final email = TextEditingController();
+  final pass = TextEditingController();
+  bool isLogin = true;
+  bool loading = false;
+
+  Future<void> submit() async {
+    setState(() => loading = true);
+    try {
+      if (isLogin) {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email.text.trim(), password: pass.text.trim());
+      } else {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email.text.trim(), password: pass.text.trim());
+      }
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SwipeScreen()));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+    setState(() => loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(isLogin ? "Login" : "Sign Up")),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(controller: email, decoration: InputDecoration(labelText: "Email")),
+            SizedBox(height: 15),
+            TextField(controller: pass, obscureText: true, decoration: InputDecoration(labelText: "Password (6+ letter)")),
+            SizedBox(height: 25),
+            loading ? CircularProgressIndicator() : ElevatedButton(onPressed: submit, child: Text(isLogin ? "Login Karo" : "Account Banao")),
+            TextButton(onPressed: () => setState(() => isLogin = !isLogin), child: Text(isLogin ? "Naya account hai? Sign Up karo" : "Pehle se account hai? Login karo")),
           ],
         ),
       ),
