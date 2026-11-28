@@ -9,9 +9,12 @@ workflows:
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
-      - name: Fix Android project
-        script: flutter create . --project-name saathiya_app --platforms=android
-      - name: Build APK
+     - name: Fix Android project
+      script: flutter create . --project-name saathiya_app --platforms=android
+    - name: Set Firebase package name
+      script: |
+        sed -i 's/applicationId = ".*"/applicationId = "com.saathiya.app"/' android/app/build.gradle || sed -i 's/applicationId ".*"/applicationId "com.saathiya.app"/' android/app/build.gradle
+        ls android/app/google-services.json
         script: flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
