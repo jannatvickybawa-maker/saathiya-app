@@ -61,11 +61,15 @@ class _SwipeScreenState extends State<SwipeScreen> {
     {"name": "Priya, 21 - Mumbai", "img": "https://i.pravatar.cc/400?img=9"},
   ];
   void next(bool liked) {
-    if (liked) {
-      showDialog(context: context, builder: (_) => AlertDialog(title: Text("MATCH! ❤️"), content: Text(profiles[index]["name"] + " ne bhi tumhe like kiya!"), actions: [TextButton(onPressed: ()=>Navigator.pop(context), child: Text("Chat Karo"))]));
-    }
-    setState(() => index = (index + 1) % profiles.length);
+  if (liked) {
+    showDialog(context: context, builder: (_) => AlertDialog(title: Text("MATCH! ❤️"), content: Text(profiles[index]["name"] + " ne bhi tumhe like kiya!"), actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text("OK"))]));
   }
+  if (index < profiles.length - 1) {
+    setState(() => index++);
+  } else {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => FinishScreen()));
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +84,25 @@ class _SwipeScreenState extends State<SwipeScreen> {
               SizedBox(width: 20),
               ElevatedButton(onPressed: () => next(true), child: Text("Like ❤️")),
             ])
+          ],
+        ),
+      ),
+    );
+  }
+}
+class FinishScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Profiles Khatam!", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+            SizedBox(height: 15),
+            Text("Abhi ke liye aur profile nahi hai."),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SwipeScreen())), child: Text("Phir Se Dekho")),
           ],
         ),
       ),
